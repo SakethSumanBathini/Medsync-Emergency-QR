@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>EMERGENCY Medical Profile | MedSync</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0a0f1a;
+        --card: #111827;
+        --card2: #1e293b;
+        --accent: #00d4aa;
+        --red: #ef4444;
+        --amber: #f59e0b;
+        --blue: #3b82f6;
+        --green: #10b981;
+        --white: #ffffff;
+        --gray: #94a3b8;
+        --light: #c5d0dc;
+        --triage: #ef4444;
+      }
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background: var(--bg);
+        color: var(--white);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ECG Heartbeat Animation */
+      .ecg-container {
+        width: 100%;
+        height: 40px;
+        overflow: hidden;
+        background: #0d1117;
+        border-bottom: 1px solid rgba(0, 212, 170, 0.2);
+        position: relative;
+      }
+      .ecg-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 100%;
+        animation: ecgScroll 3s linear infinite;
+      }
+      @keyframes ecgScroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      .ecg-line svg {
+        width: 50%;
+        height: 100%;
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      /* Alert Banner */
+      .alert-banner {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        padding: 14px 20px;
+        text-align: center;
+        animation: bannerPulse 2s ease-in-out infinite;
+        position: relative;
+      }
+      @keyframes bannerPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.85;
+        }
+      }
+      .alert-banner h1 {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+      .alert-banner .sub {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 4px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .badge-encrypted {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Triage Border */
+      .triage-border {
+        border-top: 4px solid var(--triage);
+        padding: 0;
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 16px 100px;
+      }
+
+      /* Language Toggle */
+      .lang-bar {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        padding: 12px 0;
+        flex-wrap: wrap;
+      }
+      .lang-btn {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: transparent;
+        color: var(--gray);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .lang-btn.active {
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
+      }
+
+      /* AI Summary */
+      .ai-summary {
+        background: rgba(245, 158, 11, 0.08);
+        border: 1.5px solid var(--amber);
+        border-radius: 14px;
+        padding: 16px;
+        margin: 12px 0;
+        animation: fadeIn 0.5s ease 0.3s both;
+      }
+      .ai-summary-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--amber);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .ai-summary p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--light);
+      }
+      .ai-summary .critical {
+        color: var(--red);
+        font-weight: 700;
+      }
+
+      /* Voice Button */
+      .voice-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 12px;
+        color: var(--blue);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 12px 0;
+        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .voice-btn:hover {
+        background: rgba(59, 130, 246, 0.2);
+        transform: scale(1.01);
+      }
+      .voice-btn.speaking {
+        background: rgba(59, 130, 246, 0.3);
+        animation: speakPulse 1s ease infinite;
+      }
+      @keyframes speakPulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+        }
+      }
+
+      /* Blood Group */
+      .blood-section {
+        text-align: center;
+        padding: 20px 0;
+        animation: fadeIn 0.5s ease 0.4s both;
+      }
+      .blood-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        width: 120px;
+        height: 120px;
+        border-radius: 24px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 52px;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+        animation: bloodPulse 2.5s ease-in-out infinite;
+        position: relative;
+      }
+      @keyframes bloodPulse {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+        }
+        50% {
+          transform: scale(1.04);
+          box-shadow: 0 12px 40px rgba(239, 68, 68, 0.6);
+        }
+      }
+      .blood-label {
+        font-size: 12px;
+        color: var(--gray);
+        margin-top: 8px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 600;
+      }
+
+      /* Patient Info */
+      .patient-card {
+        background: var(--card);
+        border-radius: 16px;
+        padding: 20px;
+        margin: 12px 0;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        animation: slideUp 0.4s ease both;
+      }
+      .patient-name {
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .patient-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 10px;
+      }
+      .patient-detail {
+        font-size: 13px;
+        color: var(--gray);
+      }
+      .patient-detail span {
+        color: var(--white);
+        font-weight: 600;
+      }
+
+      /* Section */
+      .section {
+        margin: 16px 0;
+        animation: slideUp 0.4s ease both;
+      }
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .section-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Allergy Tags */
+      .allergy-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .allergy-tag {
+        background: rgba(239, 68, 68, 0.15);
+        border: 1.5px solid rgba(239, 68, 68, 0.5);
+        color: #fca5a5;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        animation: allergyFlash 2s ease-in-out infinite;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      @keyframes allergyFlash {
+        0%,
+        100% {
+          opacity: 1;
+          border-color: rgba(239, 68, 68, 0.5);
+        }
+        50% {
+          opacity: 0.8;
+          border-color: rgba(239, 68, 68, 0.9);
+        }
+      }
+
+      /* Medication Cards */
+      .med-card {
+        background: var(--card2);
+        border-left: 3px solid var(--blue);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin: 8px 0;
+      }
+      .med-name {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .med-dosage {
+        color: var(--gray);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+
+      /* Condition Tags */
+      .condition-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .condition-tag {
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: var(--amber);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      /* Emergency Contacts */
+      .contact-card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px;
+        margin: 10px 0;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .contact-primary {
+        border-color: rgba(245, 158, 11, 0.4);
+        background: rgba(245, 158, 11, 0.05);
+      }
+      .contact-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .contact-name {
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .contact-rel {
+        color: var(--gray);
+        font-size: 12px;
+      }
+      .primary-badge {
+        background: var(--amber);
+        color: var(--bg);
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        letter-spacing: 1px;
+      }
+      .call-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        margin-top: 10px;
+        transition: all 0.15s;
+        font-family: inherit;
+        border: none;
+        cursor: pointer;
+      }
+      .call-btn-green {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+      }
+      .call-btn-green:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      }
+      .call-btn-green:active {
+        transform: scale(0.97);
+      }
+
+      /* Quick Emergency Buttons - Sticky */
+      .emergency-sticky {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 15, 26, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 10px 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 1000;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .emergency-sticky a {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 14px 8px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13px;
+        transition: all 0.15s;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .btn-ambulance {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+        color: white;
+      }
+      .btn-112 {
+        background: rgba(245, 158, 11, 0.15);
+        border: 1.5px solid var(--amber);
+        color: var(--amber);
+      }
+      .btn-hospital {
+        background: rgba(0, 212, 170, 0.1);
+        border: 1.5px solid var(--accent);
+        color: var(--accent);
+      }
+
+      /* First Aid */
+      .firstaid-card {
+        background: rgba(16, 185, 129, 0.06);
+        border: 1.5px solid rgba(16, 185, 129, 0.3);
+        border-radius: 14px;
+        padding: 16px;
+        margin: 12px 0;
+      }
+      .firstaid-title {
+        color: var(--green);
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .firstaid-step {
+        display: flex;
+        gap: 10px;
+        margin: 8px 0;
+        align-items: flex-start;
+      }
+      .firstaid-num {
+        background: var(--green);
+        color: var(--bg);
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .firstaid-text {
+        font-size: 13px;
+        color: var(--light);
+        line-height: 1.5;
+      }
+
+      /* Surgery/Insurance */
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 13px;
+      }
+      .info-label {
+        color: var(--gray);
+      }
+      .info-value {
+        color: var(--white);
+        font-weight: 600;
+        text-align: right;
+      }
+
+      /* Chat */
+      .chat-section {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px;
+        margin: 16px 0;
+      }
+      .chat-input {
+        width: 100%;
+        background: var(--card2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 12px;
+        color: var(--white);
+        font-size: 14px;
+        font-family: inherit;
+        resize: none;
+        margin-top: 8px;
+      }
+      .chat-input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .chat-input::placeholder {
+        color: var(--gray);
+      }
+      .chat-send {
+        width: 100%;
+        padding: 12px;
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 8px;
+        font-family: inherit;
+        transition: all 0.15s;
+      }
+      .chat-send:hover {
+        opacity: 0.9;
+        transform: scale(1.01);
+      }
+      .chat-messages {
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .chat-msg {
+        background: var(--card2);
+        border-radius: 8px;
+        padding: 10px;
+        margin: 6px 0;
+        font-size: 13px;
+      }
+      .chat-msg-name {
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 11px;
+      }
+      .chat-msg-time {
+        color: var(--gray);
+        font-size: 10px;
+        float: right;
+      }
+
+      /* Visit Counter */
+      .visit-counter {
+        text-align: center;
+        padding: 8px;
+        font-size: 11px;
+        color: var(--gray);
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 11px;
+        color: var(--gray);
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        margin-top: 20px;
+      }
+      .footer .medsync-logo {
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Collapsible */
+      .collapsible-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        padding: 12px 0;
+      }
+      .collapsible-header .arrow {
+        transition: transform 0.3s;
+        color: var(--gray);
+      }
+      .collapsible-header.open .arrow {
+        transform: rotate(180deg);
+      }
+      .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      .collapsible-content.open {
+        max-height: 500px;
+      }
+
+      /* Responsive */
+      @media (max-width: 400px) {
+        .blood-badge {
+          width: 100px;
+          height: 100px;
+          font-size: 44px;
+        }
+        .patient-name {
+          font-size: 20px;
+        }
+        .call-btn {
+          padding: 16px;
+          font-size: 17px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ECG Heartbeat Line -->
+    <div class="ecg-container">
+      <div class="ecg-line">
+        <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+          <polyline
+            fill="none"
+            stroke="#00D4AA"
+            stroke-width="1.5"
+            points="0,20 50,20 60,20 70,20 80,20 90,20 100,20 120,20 130,20 140,8 148,32 156,5 164,35 172,20 180,20 200,20 250,20 260,20 270,20 280,20 290,20 300,20 320,20 330,20 340,8 348,32 356,5 364,35 372,20 380,20 400,20 450,20 460,20 470,20 480,20 490,20 500,20 520,20 530,20 540,8 548,32 556,5 564,35 572,20 580,20 600,20"
+          />
+        </svg>
+        <svg viewBox="0 0 600 40" preserveAspectRatio="none">
+          <polyline
+            fill="none"
+            stroke="#00D4AA"
+            stroke-width="1.5"
+            points="0,20 50,20 60,20 70,20 80,20 90,20 100,20 120,20 130,20 140,8 148,32 156,5 164,35 172,20 180,20 200,20 250,20 260,20 270,20 280,20 290,20 300,20 320,20 330,20 340,8 348,32 356,5 364,35 372,20 380,20 400,20 450,20 460,20 470,20 480,20 490,20 500,20 520,20 530,20 540,8 548,32 556,5 564,35 572,20 580,20 600,20"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Alert Banner -->
+    <div class="alert-banner">
+      <h1>⚠ EMERGENCY MEDICAL PROFILE</h1>
+      <div class="sub">
+        <span>Last Updated: 8 March 2026</span>
+        <span class="badge-encrypted">🔒 256-bit Encrypted</span>
+        <span id="visitCount">Loading views...</span>
+      </div>
+    </div>
+
+    <!-- Triage Border -->
+    <div class="triage-border"></div>
+
+    <div class="container">
+      <!-- Language Toggle -->
+      <div class="lang-bar">
+        <button class="lang-btn active" onclick="setLang('en')">English</button>
+        <button class="lang-btn" onclick="setLang('hi')">हिंदी</button>
+        <button class="lang-btn" onclick="setLang('te')">తెలుగు</button>
+        <button class="lang-btn" onclick="setLang('ta')">தமிழ்</button>
+      </div>
+
+      <!-- AI Emergency Summary -->
+      <div class="ai-summary">
+        <div class="ai-summary-title">🧠 AI Emergency Summary</div>
+        <p>
+          18-year-old Male with <strong>Diabetes Type 1</strong>,
+          <strong>Asthma</strong>, and <strong>Heart Disease</strong>.
+          <span class="critical"
+            >⚠ ALLERGIC to Penicillin, Sulfa Drugs, and Peanuts.</span
+          >
+          Currently on Metformin 500mg and Aspirin 75mg. Has cardiac stent
+          (2024).
+          <span class="critical"
+            >DO NOT administer Penicillin-based antibiotics. Check blood sugar
+            if unconscious.</span
+          >
+        </p>
+      </div>
+
+      <!-- Voice Readout -->
+      <button class="voice-btn" id="voiceBtn" onclick="readAloud()">
+        🔊
+        <span
+          id="voiceBtnText"
+          data-en="Read Aloud — Tap to hear emergency info"
+          data-hi="जोर से पढ़ें"
+          data-te="పెద్దగా చదవండి"
+          data-ta="சத்தமாக படிக்கவும்"
+          >Read Aloud — Tap to hear emergency info</span
+        >
+      </button>
+
+      <!-- Blood Group -->
+      <div class="blood-section">
+        <div class="blood-badge">O+</div>
+        <div
+          class="blood-label"
+          data-en="Blood Group"
+          data-hi="रक्त समूह"
+          data-te="రక్త వర్గం"
+          data-ta="இரத்தப் பிரிவு"
+        >
+          Blood Group
+        </div>
+      </div>
+
+      <!-- Allergies -->
+      <div class="section" style="animation-delay: 0.5s">
+        <div class="section-header">
+          <div class="section-icon" style="background: rgba(239, 68, 68, 0.15)">
+            ⚠
+          </div>
+          <div
+            class="section-title"
+            style="color: var(--red)"
+            data-en="ALLERGIES — CRITICAL"
+            data-hi="एलर्जी — गंभीर"
+            data-te="అలెర్జీలు — ప్రమాదకరం"
+            data-ta="ஒவ்வாமை — ஆபத்தானது"
+          >
+            ALLERGIES — CRITICAL
+          </div>
+        </div>
+        <div class="allergy-tags">
+          <div class="allergy-tag">⚠ Penicillin</div>
+          <div class="allergy-tag">⚠ Sulfa Drugs</div>
+          <div class="allergy-tag">⚠ Peanuts</div>
+        </div>
+      </div>
+
+      <!-- Medications -->
+      <div class="section" style="animation-delay: 0.6s">
+        <div class="section-header">
+          <div
+            class="section-icon"
+            style="background: rgba(59, 130, 246, 0.15)"
+          >
+            💊
+          </div>
+          <div
+            class="section-title"
+            style="color: var(--blue)"
+            data-en="Current Medications"
+            data-hi="वर्तमान दवाइयां"
+            data-te="ప్రస్తుత మందులు"
+            data-ta="தற்போதைய மருந்துகள்"
+          >
+            Current Medications
+          </div>
+        </div>
+        <div class="med-card">
+          <div class="med-name">Metformin 500mg</div>
+          <div class="med-dosage">Twice daily — Morning & Evening</div>
+        </div>
+        <div class="med-card">
+          <div class="med-name">Amlodipine 5mg</div>
+          <div class="med-dosage">Once daily — Night</div>
+        </div>
+        <div class="med-card">
+          <div class="med-name">Aspirin 75mg</div>
+          <div class="med-dosage">Once daily — Morning</div>
+        </div>
+        <div class="med-card">
+          <div class="med-name">Salbutamol Inhaler</div>
+          <div class="med-dosage">As needed — For asthma</div>
+        </div>
+      </div>
+
+      <!-- Patient Info -->
+      <div class="patient-card" style="animation-delay: 0.7s">
+        <div class="patient-name">Saketh Suman Bathini</div>
+        <div class="patient-details">
+          <div class="patient-detail">
+            <span data-en="Age" data-hi="उम्र" data-te="వయసు" data-ta="வயது"
+              >Age</span
+            >: <span>18 years</span>
+          </div>
+          <div class="patient-detail">
+            <span
+              data-en="Gender"
+              data-hi="लिंग"
+              data-te="లింగం"
+              data-ta="பாலினம்"
+              >Gender</span
+            >: <span>Male</span>
+          </div>
+          <div class="patient-detail">
+            <span>Height</span>: <span>160 cm</span>
+          </div>
+          <div class="patient-detail">
+            <span>Weight</span>: <span>68 kg</span>
+          </div>
+          <div class="patient-detail">
+            <span>BMI</span>:
+            <span style="color: var(--amber)">26.6 (Overweight)</span>
+          </div>
+          <div class="patient-detail">
+            <span
+              data-en="Risk Score"
+              data-hi="जोखिम स्कोर"
+              data-te="రిస్క్ స్కోర్"
+              data-ta="ஆபத்து மதிப்பெண்"
+              >Risk Score</span
+            >: <span style="color: var(--red)">65/100 (High)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chronic Conditions -->
+      <div class="section" style="animation-delay: 0.8s">
+        <div class="section-header">
+          <div
+            class="section-icon"
+            style="background: rgba(245, 158, 11, 0.15)"
+          >
+            🫀
+          </div>
+          <div
+            class="section-title"
+            style="color: var(--amber)"
+            data-en="Chronic Conditions"
+            data-hi="पुरानी बीमारियां"
+            data-te="దీర్ఘకాలిక పరిస్థితులు"
+            data-ta="நாள்பட்ட நிலைமைகள்"
+          >
+            Chronic Conditions
+          </div>
+        </div>
+        <div class="condition-tags">
+          <div class="condition-tag">Diabetes Type 1</div>
+          <div class="condition-tag">Asthma</div>
+          <div class="condition-tag">Heart Disease</div>
+        </div>
+      </div>
+
+      <!-- First Aid Instructions -->
+      <div class="firstaid-card" style="animation-delay: 0.9s">
+        <div class="firstaid-title">🩺 AI First-Aid Instructions</div>
+        <div class="firstaid-step">
+          <div class="firstaid-num">1</div>
+          <div class="firstaid-text">
+            <strong>Check blood sugar immediately</strong> if patient is
+            unconscious — patient has Type 1 Diabetes and carries an insulin
+            pen.
+          </div>
+        </div>
+        <div class="firstaid-step">
+          <div class="firstaid-num">2</div>
+          <div class="firstaid-text">
+            <strong>DO NOT give Penicillin-based antibiotics</strong>
+            (Amoxicillin, Ampicillin) — patient is severely allergic. Also avoid
+            Sulfa drugs.
+          </div>
+        </div>
+        <div class="firstaid-step">
+          <div class="firstaid-num">3</div>
+          <div class="firstaid-text">
+            <strong>Check for asthma inhaler</strong> in patient's belongings if
+            breathing difficulty observed. Salbutamol inhaler prescribed.
+          </div>
+        </div>
+        <div class="firstaid-step">
+          <div class="firstaid-num">4</div>
+          <div class="firstaid-text">
+            <strong>Patient has cardiac stent</strong> (2024) — on blood thinner
+            (Aspirin). Apply pressure to wounds, bleeding may be harder to stop.
+          </div>
+        </div>
+        <div class="firstaid-step">
+          <div class="firstaid-num">5</div>
+          <div class="firstaid-text">
+            Place in <strong>recovery position</strong> if unconscious but
+            breathing. Call 108 immediately.
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Contacts -->
+      <div class="section" style="animation-delay: 1s">
+        <div class="section-header">
+          <div
+            class="section-icon"
+            style="background: rgba(16, 185, 129, 0.15)"
+          >
+            📞
+          </div>
+          <div
+            class="section-title"
+            style="color: var(--green)"
+            data-en="Emergency Contacts"
+            data-hi="आपातकालीन संपर्क"
+            data-te="అత్యవసర సంప్రకాలు"
+            data-ta="அவசர தொடர்புகள்"
+          >
+            Emergency Contacts
+          </div>
+        </div>
+
+        <div class="contact-card contact-primary">
+          <div class="contact-header">
+            <div>
+              <div class="contact-name">Priya</div>
+              <div class="contact-rel">Spouse</div>
+            </div>
+            <div class="primary-badge">⭐ PRIMARY</div>
+          </div>
+          <a href="tel:9876543210" class="call-btn call-btn-green"
+            >📞 CALL Priya — 9876543210</a
+          >
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-header">
+            <div>
+              <div class="contact-name">Vikram</div>
+              <div class="contact-rel">Brother</div>
+            </div>
+          </div>
+          <a href="tel:9876543211" class="call-btn call-btn-green"
+            >📞 CALL Vikram — 9876543211</a
+          >
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-header">
+            <div>
+              <div class="contact-name">Dr. Anjali Mehta</div>
+              <div class="contact-rel">Doctor</div>
+            </div>
+          </div>
+          <a href="tel:9876543212" class="call-btn call-btn-green"
+            >📞 CALL Dr. Anjali Mehta — 9876543212</a
+          >
+        </div>
+      </div>
+
+      <!-- Surgical History & Insurance (Collapsible) -->
+      <div class="section" style="animation-delay: 1.1s">
+        <div class="collapsible-header" onclick="toggleSection(this)">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <div
+              class="section-icon"
+              style="background: rgba(139, 92, 246, 0.15)"
+            >
+              🏥
+            </div>
+            <div
+              class="section-title"
+              style="color: #a78bfa"
+              data-en="Surgical History & Insurance"
+              data-hi="सर्जरी इतिहास और बीमा"
+              data-te="శస్త్రచికిత్స చరిత్ర"
+              data-ta="அறுவை சிகிச்சை வரலாறு"
+            >
+              Surgical History & Insurance
+            </div>
+          </div>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="info-row">
+            <span class="info-label">Surgery 1</span
+            ><span class="info-value">Appendectomy (2020)</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Surgery 2</span
+            ><span class="info-value">Cardiac Stent Placement (2024)</span>
+          </div>
+          <div class="info-row">
+            <span
+              class="info-label"
+              data-en="Insurance"
+              data-hi="बीमा"
+              data-te="బీమా"
+              data-ta="காப்பீடு"
+              >Insurance</span
+            ><span class="info-value">Star Health Insurance</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Policy #</span
+            ><span class="info-value">SH2025-4892</span>
+          </div>
+          <div class="info-row">
+            <span
+              class="info-label"
+              data-en="Organ Donor"
+              data-hi="अंग दाता"
+              data-te="అవయవ దాత"
+              data-ta="உறுப்பு தானம்"
+              >Organ Donor</span
+            ><span class="info-value" style="color: var(--green)">✅ Yes</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Notes</span
+            ><span
+              class="info-value"
+              style="color: var(--red); text-align: right; max-width: 60%"
+              >Carries insulin pen. Check blood sugar if unconscious. DO NOT
+              give Penicillin.</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Chat -->
+      <div class="chat-section" style="animation-delay: 1.2s">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px">
+          💬 Send Message to Patient's Family
+        </div>
+        <div style="font-size: 12px; color: var(--gray)">
+          Help the family locate their loved one
+        </div>
+        <input
+          class="chat-input"
+          placeholder="Your name"
+          id="chatName"
+          style="height: auto; margin-top: 10px"
+        />
+        <textarea
+          class="chat-input"
+          rows="3"
+          placeholder="I found this person at [location]. Ambulance has been called..."
+          id="chatMsg"
+        ></textarea>
+        <button class="chat-send" onclick="sendMessage()">Send Message</button>
+        <div class="chat-messages" id="chatMessages"></div>
+      </div>
+
+      <!-- Visit Counter -->
+      <div class="visit-counter" id="visitText">
+        This profile has been viewed <strong id="viewCount">0</strong> times
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        Powered by
+        <span class="medsync-logo"
+          >Med<span style="color: var(--white)">∿</span>Sync</span
+        ><br />
+        <span style="margin-top: 4px; display: inline-block"
+          >Emergency use only — Team Kalashnikov | Code with Flow 2026</span
+        >
+      </div>
+    </div>
+
+    <!-- Sticky Emergency Buttons -->
+    <div class="emergency-sticky">
+      <a href="tel:108" class="btn-ambulance">🚑 108</a>
+      <a href="tel:112" class="btn-112">📞 112</a>
+      <a
+        href="https://www.google.com/maps/search/hospitals+near+me"
+        target="_blank"
+        class="btn-hospital"
+        >🏥 Hospitals</a
+      >
+    </div>
+
+    <script>
+      // Visit Counter using localStorage
+      let views = parseInt(localStorage.getItem("medsync_views") || "47");
+      views++;
+      localStorage.setItem("medsync_views", views);
+      document.getElementById("viewCount").textContent = views;
+      document.getElementById("visitCount").textContent = views + " views";
+
+      // Voice Readout
+      let speaking = false;
+      function readAloud() {
+        if (speaking) {
+          window.speechSynthesis.cancel();
+          speaking = false;
+          document.getElementById("voiceBtn").classList.remove("speaking");
+          return;
+        }
+        const text =
+          "Emergency medical profile for Saketh Suman Bathini. Age 18, Male. Blood group O Positive. ALLERGIC to Penicillin, Sulfa Drugs, and Peanuts. Currently taking Metformin 500 milligrams twice daily, Amlodipine 5 milligrams at night, Aspirin 75 milligrams in the morning, and Salbutamol inhaler as needed. Chronic conditions include Diabetes Type 1, Asthma, and Heart Disease. Patient has cardiac stent placed in 2024. DO NOT give Penicillin based antibiotics. Check blood sugar if unconscious. Primary emergency contact Priya, spouse, phone number 9 8 7 6 5 4 3 2 1 0. Call 108 for ambulance.";
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.onend = () => {
+          speaking = false;
+          document.getElementById("voiceBtn").classList.remove("speaking");
+        };
+        window.speechSynthesis.speak(utterance);
+        speaking = true;
+        document.getElementById("voiceBtn").classList.add("speaking");
+      }
+
+      // Multi-language
+      const translations = {
+        en: {}, // default
+        hi: {
+          Age: "उम्र",
+          Gender: "लिंग",
+          "Blood Group": "रक्त समूह",
+          "ALLERGIES — CRITICAL": "एलर्जी — गंभीर",
+          "Current Medications": "वर्तमान दवाइयां",
+          "Chronic Conditions": "पुरानी बीमारियां",
+          "Emergency Contacts": "आपातकालीन संपर्क",
+          "Risk Score": "जोखिम स्कोर",
+          "Surgical History & Insurance": "सर्जरी इतिहास और बीमा",
+          Insurance: "बीमा",
+          "Organ Donor": "अंग दाता",
+          "Read Aloud — Tap to hear emergency info":
+            "जोर से पढ़ें — आपातकालीन जानकारी सुनें",
+        },
+        te: {
+          Age: "వయసు",
+          Gender: "లింగం",
+          "Blood Group": "రక్త వర్గం",
+          "ALLERGIES — CRITICAL": "అలెర్జీలు — ప్రమాదకరం",
+          "Current Medications": "ప్రస్తుత మందులు",
+          "Chronic Conditions": "దీర్ఘకాలిక పరిస్థితులు",
+          "Emergency Contacts": "అత్యవసర సంప్రకాలు",
+          "Risk Score": "రిస్క్ స్కోర్",
+          "Surgical History & Insurance": "శస్త్రచికిత్స చరిత్ర",
+          Insurance: "బీమా",
+          "Organ Donor": "అవయవ దాత",
+          "Read Aloud — Tap to hear emergency info": "పెద్దగా చదవండి",
+        },
+        ta: {
+          Age: "வயது",
+          Gender: "பாலினம்",
+          "Blood Group": "இரத்தப் பிரிவு",
+          "ALLERGIES — CRITICAL": "ஒவ்வாமை — ஆபத்தானது",
+          "Current Medications": "தற்போதைய மருந்துகள்",
+          "Chronic Conditions": "நாள்பட்ட நிலைமைகள்",
+          "Emergency Contacts": "அவசர தொடர்புகள்",
+          "Risk Score": "ஆபத்து மதிப்பெண்",
+          "Surgical History & Insurance": "அறுவை சிகிச்சை வரலாறு",
+          Insurance: "காப்பீடு",
+          "Organ Donor": "உறுப்பு தானம்",
+          "Read Aloud — Tap to hear emergency info": "சத்தமாக படிக்கவும்",
+        },
+      };
+
+      function setLang(lang) {
+        document
+          .querySelectorAll(".lang-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelector(`.lang-btn[onclick="setLang('${lang}')"]`)
+          .classList.add("active");
+        document.querySelectorAll("[data-" + lang + "]").forEach((el) => {
+          el.textContent = el.getAttribute("data-" + lang);
+        });
+        // Fallback for elements with data-en
+        if (lang !== "en") {
+          document.querySelectorAll("[data-en]").forEach((el) => {
+            const key = el.getAttribute("data-en");
+            if (translations[lang] && translations[lang][key]) {
+              el.textContent = translations[lang][key];
+            }
+          });
+        } else {
+          document.querySelectorAll("[data-en]").forEach((el) => {
+            el.textContent = el.getAttribute("data-en");
+          });
+        }
+      }
+
+      // Collapsible sections
+      function toggleSection(header) {
+        header.classList.toggle("open");
+        header.nextElementSibling.classList.toggle("open");
+      }
+
+      // Chat messages
+      function sendMessage() {
+        const name = document.getElementById("chatName").value.trim();
+        const msg = document.getElementById("chatMsg").value.trim();
+        if (!name || !msg) {
+          alert("Please enter your name and message");
+          return;
+        }
+        const container = document.getElementById("chatMessages");
+        const time = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        container.innerHTML =
+          `<div class="chat-msg"><div class="chat-msg-name">${name} <span class="chat-msg-time">${time}</span></div><div style="margin-top:4px;color:var(--light)">${msg}</div></div>` +
+          container.innerHTML;
+        document.getElementById("chatName").value = "";
+        document.getElementById("chatMsg").value = "";
+      }
+
+      // Auto-open surgical history
+      document.querySelector(".collapsible-header").click();
+    </script>
+  </body>
+</html>
